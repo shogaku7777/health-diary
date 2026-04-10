@@ -7,7 +7,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="健康日記">
 <meta name="theme-color" content="#c8702a">
-<title>正覚さんの健康日記</title><style>
+<title>正覚さんの健康日記</title>
+<style>
   :root {
     --primary: #c8702a;
     --primary-light: #e8924a;
@@ -25,18 +26,8 @@
     --blue: #60a5fa;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  body {
-    font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-  }
-  .header {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-    padding: 52px 20px 20px;
-    color: white;
-    box-shadow: 0 4px 20px rgba(200,112,42,0.3);
-  }
+  body { font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .header { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); padding: 52px 20px 20px; color: white; box-shadow: 0 4px 20px rgba(200,112,42,0.3); }
   .header-title { font-size: 22px; font-weight: 800; letter-spacing: 0.05em; }
   .header-date { font-size: 13px; opacity: 0.85; margin-top: 4px; }
   .header-quote { background: rgba(255,255,255,0.2); border-radius: 12px; padding: 10px 14px; margin-top: 12px; font-size: 13px; }
@@ -137,16 +128,17 @@
 <div id="tab-install" class="tab-content"><div class="content">
   <div class="install-card">
     <div style="font-size:15px;font-weight:700;margin-bottom:14px;">📱 ホーム画面への追加方法</div>
-    <div class="install-step"><div class="install-num">1</div><div class="install-text">このページを<strong>Safari</strong>で開く</div></div>
-    <div class="install-step"><div class="install-num">2</div><div class="install-text">画面下の<strong>共有ボタン（□↑）</strong>をタップ</div></div>
-    <div class="install-step"><div class="install-num">3</div><div class="install-text"><strong>「ホーム画面に追加」</strong>を選ぶ</div></div>
-    <div class="install-step"><div class="install-num">4</div><div class="install-text">名前を<strong>「健康日記」</strong>にして「追加」</div></div>
+    <div class="install-step"><div class="install-num">1</div><div class="install-text">このページをSafariで開く</div></div>
+    <div class="install-step"><div class="install-num">2</div><div class="install-text">画面下の共有ボタン（□↑）をタップ</div></div>
+    <div class="install-step"><div class="install-num">3</div><div class="install-text">「ホーム画面に追加」を選ぶ</div></div>
+    <div class="install-step"><div class="install-num">4</div><div class="install-text">名前を「健康日記」にして「追加」</div></div>
   </div>
   <div class="card"><div class="card-title">🗑️ データ管理</div>
   <button class="btn-secondary" onclick="exportData()">📤 データをコピー（バックアップ）</button>
   <button class="btn-secondary" onclick="clearData()" style="color:#f87171;">🗑️ 全データを削除</button>
   </div>
-</div></div><script>
+</div></div>
+<script>
 const STORAGE_KEY='masagaku_health_v1';
 const QUOTES=['今日も一歩、未来の自分への投資💪','継続は力なり。記録が変化を生む✨','血圧も体重も、知ることが第一歩🌱','今日の積み重ねが10年後を変える🔥','無理せず、でも諦めず。それがコツ😊'];
 function getTodayKey(){return new Date().toISOString().slice(0,10);}
@@ -179,7 +171,45 @@ function updateStreak(records){document.getElementById('streakNum').textContent=
 function renderHistory(records){const sorted=Object.entries(records).sort(([a],[b])=>b.localeCompare(a)).slice(0,30);const el=document.getElementById('historyList');if(!sorted.length){el.innerHTML='<div style="color:var(--text-muted);font-size:14px;text-align:center;padding:20px;">まだ記録がありません。<br>今日から始めよう！🌱</div>';return;}el.innerHTML=sorted.map(([date,v])=>{const memo=v.memo?`<div class="history-memo">${v.memo.slice(0,22)}${v.memo.length>22?'…':''}</div>`:'';const vals=[v.weight?`⚖️ ${v.weight}kg`:'',v.systolic?`💗 ${v.systolic}/${v.diastolic}`:'',v.mealAdvice?'🍱 AI済':''].filter(Boolean).join('<br>');return`<div class="history-item"><div><div class="history-date">${formatDate(date)}</div>${memo}</div><div class="history-vals">${vals}</div></div>`;}).join('');}
 function renderCharts(records){const sorted=Object.entries(records).filter(([,v])=>v.weight||v.systolic).sort(([a],[b])=>a.localeCompare(b)).slice(-7);const wData=sorted.filter(([,v])=>v.weight);if(wData.length>1){document.getElementById('weightChartCard').style.display='block';const ws=wData.map(([,v])=>Number(v.weight));const min=Math.min(...ws)-0.5;const max=Math.max(...ws)+0.5;document.getElementById('weightChart').innerHTML=wData.map(([date,v])=>{const pct=Math.max(((Number(v.weight)-min)/(max-min))*100,5);return`<div class="chart-bar-wrap"><div class="chart-val">${v.weight}</div><div class="chart-bar" style="height:${pct}%"></div><div class="chart-label">${date.slice(5)}</div></div>`;}).join('');}const bpData=sorted.filter(([,v])=>v.systolic);if(bpData.length>1){document.getElementById('bpChartCard').style.display='block';const sys=bpData.map(([,v])=>Number(v.systolic));const min=Math.min(...sys)-5;const max=Math.max(...sys)+5;document.getElementById('bpChart').innerHTML=bpData.map(([date,v])=>{const pct=Math.max(((Number(v.systolic)-min)/(max-min))*100,5);const status=getBPStatus(Number(v.systolic),Number(v.diastolic));const color=status?status.color:'#c8702a';return`<div class="chart-bar-wrap"><div class="chart-val" style="color:${color}">${v.systolic}</div><div class="chart-bar" style="height:${pct}%;background:linear-gradient(180deg,${color}88,${color})"></div><div class="chart-label">${date.slice(5)}</div></div>`;}).join('');}}
 function retakePhoto(){document.getElementById('mealImg').style.display='none';document.getElementById('retakeBtn').style.display='none';document.getElementById('uploadArea').style.display='block';document.getElementById('adviceWrap').style.display='none';}
-async function handleMealPhoto(e){const file=e.target.files[0];if(!file)return;const url=URL.createObjectURL(file);document.getElementById('mealImg').src=url;document.getElementById('mealImg').style.display='block';document.getElementById('uploadArea').style.display='none';document.getElementById('retakeBtn').style.display='block';document.getElementById('adviceWrap').style.display='none';document.getElementById('spinnerWrap').style.display='block';try{const base64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:`あなたは正覚慎也さん（43歳男性）専属の栄養・健康アドバイザーです。健康診断結果：血圧141/96（軽度高血圧）、LDLコレステロール132（やや高め）、空腹時血糖104（境界域）、腹囲85cm（メタボ予備群）、びらん性胃炎あり。食事写真を見て温かく丁寧にアドバイスしてください。良い点を必ず褒め、改善ポイントと明日への一言を200〜250字で。`,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:file.type,data:base64}},{type:'text',text:'この食事についてアドバイスをお願いします。'}]}]})});const data=await resp.json();const advice=data.content?.find(b=>b.type==='text')?.text||'分析できませんでした。';document.getElementById('spinnerWrap').style.display='none';document.getElementById('adviceText').textContent=advice;document.getElementById('adviceWrap').style.display='block';const records=loadRecords();const todayKey=getTodayKey();records[todayKey]={...records[todayKey],date:todayKey,mealAdvice:advice};saveRecords(records);}catch(err){document.getElementById('spinnerWrap').style.display='none';document.getElementById('adviceText').textContent='エラーが発生しました。もう一度お試しください。';document.getElementById('adviceWrap').style.display='block';}}
+</script>
+<script>
+async function handleMealPhoto(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  const url=URL.createObjectURL(file);
+  document.getElementById('mealImg').src=url;
+  document.getElementById('mealImg').style.display='block';
+  document.getElementById('uploadArea').style.display='none';
+  document.getElementById('retakeBtn').style.display='block';
+  document.getElementById('adviceWrap').style.display='none';
+  document.getElementById('spinnerWrap').style.display='block';
+  try{
+    const base64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system:`あなたは正覚慎也さん（43歳男性）専属の栄養・健康アドバイザーです。健康診断結果：血圧141/96（軽度高血圧）、LDLコレステロール132（やや高め）、空腹時血糖104（境界域）、腹囲85cm（メタボ予備群）、びらん性胃炎あり。食事写真を見て温かく丁寧にアドバイスしてください。良い点を必ず褒め、改善ポイントと明日への一言を200〜250字で。`,
+        messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:file.type,data:base64}},{type:'text',text:'この食事についてアドバイスをお願いします。'}]}]
+      })
+    });
+    const data=await resp.json();
+    const advice=data.content?.find(b=>b.type==='text')?.text||'分析できませんでした。';
+    document.getElementById('spinnerWrap').style.display='none';
+    document.getElementById('adviceText').textContent=advice;
+    document.getElementById('adviceWrap').style.display='block';
+    const records=loadRecords();
+    const todayKey=getTodayKey();
+    records[todayKey]={...records[todayKey],date:todayKey,mealAdvice:advice};
+    saveRecords(records);
+  }catch(err){
+    document.getElementById('spinnerWrap').style.display='none';
+    document.getElementById('adviceText').textContent='エラーが発生しました。もう一度お試しください。';
+    document.getElementById('adviceWrap').style.display='block';
+  }
+}
 function switchTab(name,btn){document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(el=>el.classList.remove('active'));document.getElementById('tab-'+name).classList.add('active');btn.classList.add('active');if(name==='history'){renderHistory(loadRecords());renderCharts(loadRecords());}}
 function exportData(){const data=localStorage.getItem(STORAGE_KEY)||'{}';navigator.clipboard.writeText(data).then(()=>{alert('データをコピーしました！');}).catch(()=>{alert('データ：\n'+data);});}
 function clearData(){if(confirm('本当に全データを削除しますか？')){localStorage.removeItem(STORAGE_KEY);location.reload();}}
@@ -187,5 +217,3 @@ init();
 </script>
 </body>
 </html>
-
-
